@@ -1,0 +1,49 @@
+version: '2'
+
+services:
+
+  mongodb:
+    image: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./dbdata:/data/db
+#  redis:
+#    image: redis:alpine
+#    ports:
+#      - "6379:6379"
+#    volumes:
+#      - ./redis-data:/var/lib/redis
+#    environment:
+#      - REDIS_REPLICATION_MODE=development
+#
+#  elasticsearch:
+#    image: elasticsearch:7.5.2
+#    environment:
+#      - bootstrap.memory_lock=true
+#      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+#      - discovery.type=single-node
+#    restart: on-failure
+#    ports:
+#      - "9200:9200"
+
+  app:
+    image: node:10
+    command: /bin/bash -c "yarn install && npm run dev"
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./:/usr/src/app
+    working_dir: /usr/src/app
+    environment:
+      - NODE_ENV=development
+      - MONGO_URL=mongodb://mongodb/chat
+#      - ELASTICSEARCH_URL=elasticsearch
+    depends_on:
+      - mongodb
+#      - elasticsearch
+#      - redis
+    links:
+      - mongodb
+#      - elasticsearch
+#      - redis
